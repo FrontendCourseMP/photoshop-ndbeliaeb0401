@@ -1,0 +1,27 @@
+.statusBar {
+  background: rgba(35, 35, 48, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 10px 24px;
+  display: flex;
+  gap: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ccd;
+  transition: color 0.2s;
+}
+
+.item:hover {
+  color: white;
+}
+
+.icon {
+  font-size: 16px;
+  opacity: 0.8;
+}

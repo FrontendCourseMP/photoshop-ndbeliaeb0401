@@ -1,0 +1,19 @@
+.container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: radial-gradient(circle at 20% 30%, #0f0f17, #05050a);
+  overflow: auto;
+  min-height: 0;
+}
+
+.canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s;
+  display: block;
+}

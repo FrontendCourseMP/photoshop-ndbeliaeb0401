@@ -1,0 +1,228 @@
+.toolbar {
+  width: 120px;
+  background: rgba(45, 45, 58, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 12px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-y: auto;
+}
+
+.dropzone, .exportBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(20, 20, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  color: #ddd;
+  font-size: 13px;
+  width: 100%;
+  text-align: center;
+}
+
+.dropzone {
+  background: linear-gradient(135deg, #3a3a4a, #2d2d3a);
+}
+
+.dropzone:hover, .exportBtn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #4a4a5a, #3a3a4a);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dragActive {
+  background: linear-gradient(135deg, #5a5a7a, #4a4a6a);
+  transform: scale(0.98);
+}
+
+.icon {
+  font-size: 24px;
+}
+
+.iconSmall {
+  font-size: 14px;
+}
+
+.divider {
+  width: 80%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}
+
+.exportDesktop {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.exportMobile {
+  display: none;
+  position: relative;
+  width: 100%;
+}
+
+.exportDropdownBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(20, 20, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 10px 8px;
+  cursor: pointer;
+  color: #ddd;
+  width: 100%;
+  font-size: 13px;
+}
+
+.chevron {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: #2d2d3a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  z-index: 20000;
+}
+
+.dropdown button {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #eee;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.1s;
+}
+
+.dropdown button:hover {
+  background: #4a4a5a;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #aaa;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px 6px;
+  border-radius: 16px;
+  width: 100%;
+  margin-top: auto;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    width: 100%;
+    position: relative;
+    z-index: 1000;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .dropzone {
+    flex-direction: row;
+    gap: 8px;
+    width: auto;
+    padding: 8px 16px;
+  }
+  .exportDesktop {
+    display: none;
+  }
+  .exportMobile {
+    display: block;
+    width: auto;
+    position: relative;
+    margin-right: 12px;
+  }
+  .exportDropdownBtn {
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px 16px;
+    width: auto;
+  }
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: auto;
+    right: 0;
+    background: #2d2d3a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 8px;
+    margin-bottom: 0;
+    bottom: auto;
+    z-index: 1001;
+    min-width: 100px;
+  }
+  .dropdown button {
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+  }
+  .chevron {
+    margin-top: 0;
+  }
+  .divider {
+    display: none;
+  }
+  .info {
+    display: none;
+  }
+  .icon {
+    font-size: 18px;
+  }
+  .dropzone span, .exportDropdownBtn span {
+    font-size: 12px;
+  }
+}
+.portalDropdown {
+  background: #2d2d3a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  min-width: 100px;
+}
+
+.portalDropdown button {
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: #eee;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+}
+
+.portalDropdown button:hover {
+  background: #4a4a5a;
+}
