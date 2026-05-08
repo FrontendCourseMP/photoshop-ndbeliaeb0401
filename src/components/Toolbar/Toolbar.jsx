@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useDropzone } from 'react-dropzone';
-import { FiUpload, FiInfo, FiSave, FiImage, FiChevronDown } from 'react-icons/fi';
+import { FiUpload, FiInfo, FiSave, FiImage, FiChevronDown, FiDroplet } from 'react-icons/fi';
 import styles from './Toolbar.module.css';
 
-const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7 }) => {
+const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7, onActivateEyedropper, isEyedropperActive }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState({});
   const btnRef = useRef(null);
@@ -49,7 +49,7 @@ const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7 }) => {
       >
         <input {...getInputProps()} />
         <FiUpload className={styles.icon} />
-        <span>Загрузить</span>
+        <span>Open</span>
       </div>
 
       <div className={styles.divider} />
@@ -76,7 +76,7 @@ const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7 }) => {
           onClick={() => setShowDropdown(!showDropdown)}
         >
           <FiSave className={styles.icon} />
-          <span>Экспорт</span>
+          <span>Export</span>
           <FiChevronDown className={styles.chevron} />
         </button>
         {showDropdown && createPortal(
@@ -88,6 +88,14 @@ const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7 }) => {
           document.body
         )}
       </div>
+
+      <button
+        onClick={onActivateEyedropper}
+        className={`${styles.eyedropperBtn} ${isEyedropperActive ? styles.active : ''}`}
+      >
+        <FiDroplet className={styles.icon} />
+        <span>Pick</span>
+      </button>
 
       <div className={styles.info}>
         <FiInfo className={styles.iconSmall} />

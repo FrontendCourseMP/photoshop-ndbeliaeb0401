@@ -1,11 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-export const useCanvasResize = (canvasRef) => {
+export const useCanvasResize = (canvasRef, imageData) => {
   const rafId = useRef(null);
 
   const resizeAndRedraw = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !imageData) return;
     const ctx = canvas.getContext('2d');
 
     const container = canvas.parentElement;
@@ -14,10 +14,8 @@ export const useCanvasResize = (canvasRef) => {
     const maxWidth = container.clientWidth - 32;
     const maxHeight = window.innerHeight - 200;
 
-    const originalWidth = canvas.width;
-    const originalHeight = canvas.height;
-
-    if (originalWidth === 0 || originalHeight === 0) return;
+    const originalWidth = imageData.width;
+    const originalHeight = imageData.height;
 
     let targetWidth = originalWidth;
     let targetHeight = originalHeight;
@@ -35,15 +33,14 @@ export const useCanvasResize = (canvasRef) => {
 
     canvas.style.width = `${targetWidth}px`;
     canvas.style.height = `${targetHeight}px`;
-
-    const imageData = ctx.getImageData(0, 0, originalWidth, originalHeight);
     canvas.width = targetWidth;
     canvas.height = targetHeight;
+
     const tempCanvas = new OffscreenCanvas(originalWidth, originalHeight);
     const tempCtx = tempCanvas.getContext('2d');
     tempCtx.putImageData(imageData, 0, 0);
     ctx.drawImage(tempCanvas, 0, 0, originalWidth, originalHeight, 0, 0, targetWidth, targetHeight);
-  }, [canvasRef]);
+  }, [canvasRef, imageData]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -51,11 +48,10 @@ export const useCanvasResize = (canvasRef) => {
       rafId.current = requestAnimationFrame(resizeAndRedraw);
     };
     window.addEventListener('resize', handleResize);
+    resizeAndRedraw(); // первая отрисовка
     return () => {
       window.removeEventListener('resize', handleResize);
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
   }, [resizeAndRedraw]);
-
-  return { forceResize: resizeAndRedraw };
 };
