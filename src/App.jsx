@@ -4,6 +4,7 @@ import Canvas from './components/Canvas/Canvas';
 import StatusBar from './components/StatusBar/StatusBar';
 import ChannelsPanel from './components/ChannelsPanel/ChannelsPanel';
 import InfoPanel from './components/InfoPanel/InfoPanel';
+import LevelsDialog from './components/LevelsDialog/LevelsDialog';  // импорт
 import { useImageLoader } from './hooks/useImageLoader';
 import { useImageExport } from './hooks/useImageExport';
 import { useCanvasResize } from './hooks/useCanvasResize';
@@ -18,6 +19,7 @@ function App() {
   const [imageInfo, setImageInfo] = useState({ width: null, height: null, colorDepth: null });
   const [isEyedropperActive, setIsEyedropperActive] = useState(false);
   const [pickedColor, setPickedColor] = useState(null);
+  const [isLevelsOpen, setIsLevelsOpen] = useState(false);      // состояние диалога
 
   const { loadImageFromUrl } = useImageLoader(setOriginalImageData, setImageInfo);
   const { exportPNG, exportJPG, exportGB7 } = useImageExport(canvasRef);
@@ -30,6 +32,9 @@ function App() {
     if (!isEyedropperActive) setPickedColor(null);
   };
 
+  const handleOpenLevels = () => setIsLevelsOpen(true);
+  const handleCloseLevels = () => setIsLevelsOpen(false);
+
   return (
     <div className={styles.app}>
       <Toolbar
@@ -39,9 +44,10 @@ function App() {
         onExportGB7={exportGB7}
         onActivateEyedropper={handleActivateEyedropper}
         isEyedropperActive={isEyedropperActive}
+        onOpenLevels={handleOpenLevels}
       />
       <div className={styles.mainArea}>
-      <Canvas ref={canvasRef} imageData={displayImageData} isEyedropperActive={isEyedropperActive} />
+        <Canvas ref={canvasRef} imageData={displayImageData} isEyedropperActive={isEyedropperActive} />
         <StatusBar
           width={imageInfo.width}
           height={imageInfo.height}
@@ -55,6 +61,12 @@ function App() {
         hasAlpha={hasAlpha}
       />
       <InfoPanel colorInfo={pickedColor} isActive={isEyedropperActive} />
+      
+      <LevelsDialog
+        isOpen={isLevelsOpen}
+        onClose={handleCloseLevels}
+        originalImageData={originalImageData}
+      />
     </div>
   );
 }

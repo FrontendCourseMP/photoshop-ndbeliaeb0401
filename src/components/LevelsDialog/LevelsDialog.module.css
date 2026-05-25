@@ -1,0 +1,46 @@
+.dialog {
+  background: rgba(30, 30, 40, 0.95);
+  backdrop-filter: blur(12px);
+  border: none;
+  border-radius: 20px;
+  padding: 0;
+  width: 700px;
+  max-width: 90vw;
+  color: #eee;
+  box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+}
+.dialog::backdrop {
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+}
+.container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.container h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+.content {
+  min-height: 300px;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.actions button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(20,20,30,0.8);
+  color: #eee;
+  cursor: pointer;
+  transition: 0.1s;
+}
+.actions button:hover {
+  background: #4a4a5a;
+}
