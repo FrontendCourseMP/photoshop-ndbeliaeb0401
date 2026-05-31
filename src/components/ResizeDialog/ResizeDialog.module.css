@@ -1,0 +1,109 @@
+.dialog {
+  background: rgba(30, 30, 40, 0.95);
+  backdrop-filter: blur(12px);
+  border: none;
+  border-radius: 20px;
+  padding: 0;
+  width: 400px;
+  max-width: 90vw;
+  color: #eee;
+  box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+}
+.dialog::backdrop {
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+}
+.container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.container h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #aaa;
+}
+.unitSelector {
+  display: flex;
+  gap: 10px;
+}
+.unitSelector button {
+  flex: 1;
+  padding: 6px;
+  background: rgba(20,20,30,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: #eee;
+  cursor: pointer;
+}
+.unitSelector button.active {
+  background: #5ad;
+  border-color: #aef;
+}
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.inputGroup label {
+  font-size: 13px;
+}
+.inputGroup input, .inputGroup select {
+  background: rgba(20,20,30,0.8);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 8px;
+  color: #eee;
+}
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.helpIcon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: #3a3a4a;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 20px;
+  font-size: 14px;
+  cursor: help;
+  margin-left: 8px;
+}
+.tooltip {
+  position: fixed;
+  background: #1e1e2e;
+  border: 1px solid #5ad;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  max-width: 220px;
+  z-index: 20000;
+  pointer-events: none;
+  white-space: normal;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+.actions button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(20,20,30,0.8);
+  color: #eee;
+  cursor: pointer;
+}
+.actions button:hover {
+  background: #4a4a5a;
+}

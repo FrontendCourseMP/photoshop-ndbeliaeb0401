@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useDropzone } from 'react-dropzone';
-import { FiUpload, FiInfo, FiSave, FiImage, FiChevronDown, FiDroplet, FiSliders } from 'react-icons/fi';
+import { FiUpload, FiInfo, FiSave, FiImage, FiChevronDown, FiDroplet, FiSliders,FiMaximize2 } from 'react-icons/fi';
 import styles from './Toolbar.module.css';
 
-const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7, onActivateEyedropper, isEyedropperActive, onOpenLevels }) => {
+const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7, onActivateEyedropper, isEyedropperActive, onOpenLevels,onOpenResize}) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState({});
   const btnRef = useRef(null);
@@ -104,6 +104,10 @@ const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7, onActivate
         <FiSliders className={styles.icon} />
         <span>Levels</span>
       </button>
+      <button onClick={onOpenResize} className={styles.resizeBtn}>
+  <FiMaximize2 className={styles.icon} />
+  <span>Размер</span>
+</button>
 
       <div className={styles.info}>
         <FiInfo className={styles.iconSmall} />

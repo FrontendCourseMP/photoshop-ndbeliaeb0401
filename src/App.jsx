@@ -11,6 +11,7 @@ import { useCanvasResize } from './hooks/useCanvasResize';
 import { useChannels } from './hooks/useChannels';
 import { useEyedropper } from './hooks/useEyedropper';
 import { resizeImage } from './utils/imageResize';
+import ResizeDialog from './components/ResizeDialog/ResizeDialog';
 import styles from './App.module.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
   const [isLevelsOpen, setIsLevelsOpen] = useState(false);
   const [levelsOriginalData, setLevelsOriginalData] = useState(null);
   const [scalePercent, setScalePercent] = useState(100);
+  const [isResizeOpen, setIsResizeOpen] = useState(false);
   const [interpolationMethod, setInterpolationMethod] = useState('bilinear');
 
   const { loadImageFromUrl } = useImageLoader(setOriginalImageData, setImageInfo);
@@ -100,6 +102,17 @@ function App() {
     setInterpolationMethod(method);
   };
 
+  const handleOpenResize = () => setIsResizeOpen(true);
+  const handleCloseResize = () => setIsResizeOpen(false);
+
+  const handleResizeImage = (newWidth, newHeight, method) => {
+    if (!originalImageData) return;
+    const resizedImageData = resizeImage(originalImageData, newWidth, newHeight, method);
+    setOriginalImageData(resizedImageData);
+    setDisplayImageData(resizedImageData);
+    setScalePercent(100);
+  };
+
   return (
     <div className={styles.app}>
       <Toolbar
@@ -110,6 +123,7 @@ function App() {
         onActivateEyedropper={handleActivateEyedropper}
         isEyedropperActive={isEyedropperActive}
         onOpenLevels={handleOpenLevels}
+        onOpenResize={handleOpenResize} 
       />
       <div className={styles.mainArea}>
         <Canvas ref={canvasRef} imageData={displayImageData} isEyedropperActive={isEyedropperActive} />
@@ -139,6 +153,14 @@ function App() {
         onApply={handleApplyLevels}
         onPreview={handlePreviewLevels}
         originalImageData={levelsOriginalData}
+      />
+      <ResizeDialog
+        isOpen={isResizeOpen}
+        onClose={handleCloseResize}
+        onResize={handleResizeImage}
+        originalWidth={originalImageData?.width || 0}
+        originalHeight={originalImageData?.height || 0}
+        currentMethod={interpolationMethod}
       />
     </div>
   );
