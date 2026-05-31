@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import Toolbar from './components/Toolbar/Toolbar';
 import Canvas from './components/Canvas/Canvas';
 import StatusBar from './components/StatusBar/StatusBar';
@@ -10,6 +10,7 @@ import { useImageExport } from './hooks/useImageExport';
 import { useCanvasResize } from './hooks/useCanvasResize';
 import { useChannels } from './hooks/useChannels';
 import { useEyedropper } from './hooks/useEyedropper';
+import { resizeImage } from './utils/imageResize';
 import styles from './App.module.css';
 
 function App() {
@@ -20,7 +21,9 @@ function App() {
   const [isEyedropperActive, setIsEyedropperActive] = useState(false);
   const [pickedColor, setPickedColor] = useState(null);
   const [isLevelsOpen, setIsLevelsOpen] = useState(false);
-  const [levelsOriginalData, setLevelsOriginalData] = useState(null); 
+  const [levelsOriginalData, setLevelsOriginalData] = useState(null);
+  const [scalePercent, setScalePercent] = useState(100);
+  const [interpolationMethod, setInterpolationMethod] = useState('bilinear');
 
   const { loadImageFromUrl } = useImageLoader(setOriginalImageData, setImageInfo);
   const { exportPNG, exportJPG, exportGB7 } = useImageExport(canvasRef);
@@ -28,35 +31,73 @@ function App() {
   const { activeChannels, toggleChannel, hasAlpha } = useChannels(originalImageData, setDisplayImageData);
   useEyedropper(canvasRef, isEyedropperActive, setPickedColor);
 
+  const updateDisplayWithScale = useCallback((baseImage, percent, method) => {
+    if (!baseImage) return null;
+    const scale = percent / 100;
+    const newWidth = Math.round(baseImage.width * scale);
+    const newHeight = Math.round(baseImage.height * scale);
+    if (newWidth <= 0 || newHeight <= 0) return baseImage;
+    return resizeImage(baseImage, newWidth, newHeight, method);
+  }, []);
+
+  useEffect(() => {
+    if (!originalImageData) return;
+    const newDisplay = updateDisplayWithScale(originalImageData, scalePercent, interpolationMethod);
+    setDisplayImageData(newDisplay);
+  }, [originalImageData, scalePercent, interpolationMethod, updateDisplayWithScale]);
+
+  useEffect(() => {
+    if (!originalImageData) return;
+    const container = canvasRef.current?.parentElement;
+    if (container) {
+      const maxWidth = container.clientWidth - 50;
+      const maxHeight = window.innerHeight - 200 - 50;
+      const scaleX = maxWidth / originalImageData.width;
+      const scaleY = maxHeight / originalImageData.height;
+      let initialScale = Math.min(scaleX, scaleY) * 100;
+      initialScale = Math.min(300, Math.max(12, initialScale));
+      setScalePercent(Math.round(initialScale));
+    } else {
+      setScalePercent(100);
+    }
+  }, [originalImageData]);
+
   const handleActivateEyedropper = () => {
     setIsEyedropperActive(!isEyedropperActive);
     if (!isEyedropperActive) setPickedColor(null);
   };
 
   const handleOpenLevels = () => {
-    setLevelsOriginalData(displayImageData); 
+    setLevelsOriginalData(displayImageData);
     setIsLevelsOpen(true);
   };
 
   const handleCloseLevels = () => {
     setIsLevelsOpen(false);
     if (levelsOriginalData) {
-      setDisplayImageData(levelsOriginalData); 
+      setDisplayImageData(levelsOriginalData);
     }
     setLevelsOriginalData(null);
   };
 
-  // Применяет финальное изображение после Apply
   const handleApplyLevels = (newImageData) => {
     setOriginalImageData(newImageData);
     setDisplayImageData(newImageData);
     setIsLevelsOpen(false);
     setLevelsOriginalData(null);
+    setScalePercent(100);
   };
 
-  // Предпросмотр при движении ползунков
   const handlePreviewLevels = (previewData) => {
     setDisplayImageData(previewData);
+  };
+
+  const handleScaleChange = (percent) => {
+    setScalePercent(percent);
+  };
+
+  const handleMethodChange = (method) => {
+    setInterpolationMethod(method);
   };
 
   return (
@@ -84,14 +125,20 @@ function App() {
         toggleChannel={toggleChannel}
         hasAlpha={hasAlpha}
       />
-      <InfoPanel colorInfo={pickedColor} isActive={isEyedropperActive} />
-
+      <InfoPanel
+        colorInfo={pickedColor}
+        isActive={isEyedropperActive}
+        scalePercent={scalePercent}
+        onScaleChange={handleScaleChange}
+        interpolationMethod={interpolationMethod}
+        onMethodChange={handleMethodChange}
+      />
       <LevelsDialog
         isOpen={isLevelsOpen}
         onClose={handleCloseLevels}
         onApply={handleApplyLevels}
         onPreview={handlePreviewLevels}
-        originalImageData={levelsOriginalData} 
+        originalImageData={levelsOriginalData}
       />
     </div>
   );

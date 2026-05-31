@@ -77,3 +77,28 @@
   color: #f0f0f0;
   font-family: 'Monaco', 'Menlo', monospace;
 }
+.divider {
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin: 12px 0;
+}
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.controls label {
+  font-size: 12px;
+  color: #aaa;
+}
+.controls input, .controls select {
+  background: rgba(20,20,30,0.8);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 6px;
+  color: #eee;
+}
+.controls select option {
+  background: #2d2d3a;
+}
