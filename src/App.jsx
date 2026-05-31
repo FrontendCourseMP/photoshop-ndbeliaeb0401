@@ -10,7 +10,6 @@ import { useImageExport } from './hooks/useImageExport';
 import { useCanvasResize } from './hooks/useCanvasResize';
 import { useChannels } from './hooks/useChannels';
 import { useEyedropper } from './hooks/useEyedropper';
-import { useLevels } from './hooks/useLevels';
 import styles from './App.module.css';
 
 function App() {
@@ -21,33 +20,43 @@ function App() {
   const [isEyedropperActive, setIsEyedropperActive] = useState(false);
   const [pickedColor, setPickedColor] = useState(null);
   const [isLevelsOpen, setIsLevelsOpen] = useState(false);
+  const [levelsOriginalData, setLevelsOriginalData] = useState(null); 
 
   const { loadImageFromUrl } = useImageLoader(setOriginalImageData, setImageInfo);
   const { exportPNG, exportJPG, exportGB7 } = useImageExport(canvasRef);
   useCanvasResize(canvasRef, displayImageData);
   const { activeChannels, toggleChannel, hasAlpha } = useChannels(originalImageData, setDisplayImageData);
-  const { pickedColor: eyedropperColor } = useEyedropper(canvasRef, isEyedropperActive, setPickedColor);
-  const { levelsState, updateLevels, resetLevels, applyLevels, previewLevels } = useLevels(originalImageData, setDisplayImageData);
+  useEyedropper(canvasRef, isEyedropperActive, setPickedColor);
 
   const handleActivateEyedropper = () => {
     setIsEyedropperActive(!isEyedropperActive);
     if (!isEyedropperActive) setPickedColor(null);
   };
 
-  const handleOpenLevels = () => setIsLevelsOpen(true);
-  const handleCloseLevels = () => setIsLevelsOpen(false);
-
-  const handleLevelsApply = () => {
-    applyLevels();
-    handleCloseLevels();
+  const handleOpenLevels = () => {
+    setLevelsOriginalData(displayImageData); 
+    setIsLevelsOpen(true);
   };
 
-  const handleLevelsReset = () => {
-    resetLevels();
+  const handleCloseLevels = () => {
+    setIsLevelsOpen(false);
+    if (levelsOriginalData) {
+      setDisplayImageData(levelsOriginalData); 
+    }
+    setLevelsOriginalData(null);
   };
 
-  const handleLevelsPreview = (channelId, black, gamma, white) => {
-    previewLevels(channelId, black, gamma, white);
+  // Применяет финальное изображение после Apply
+  const handleApplyLevels = (newImageData) => {
+    setOriginalImageData(newImageData);
+    setDisplayImageData(newImageData);
+    setIsLevelsOpen(false);
+    setLevelsOriginalData(null);
+  };
+
+  // Предпросмотр при движении ползунков
+  const handlePreviewLevels = (previewData) => {
+    setDisplayImageData(previewData);
   };
 
   return (
@@ -78,16 +87,12 @@ function App() {
       <InfoPanel colorInfo={pickedColor} isActive={isEyedropperActive} />
 
       <LevelsDialog
-  isOpen={isLevelsOpen}
-  onClose={handleCloseLevels}
-  onApplyLevels={(imageData) => {
-    setDisplayImageData(imageData);
-    setOriginalImageData(imageData); // если нужно сохранить изменения
-  }}
-  onPreview={handleLevelsPreview}
-  originalImageData={originalImageData}
-  levelsState={levelsState}
-/>
+        isOpen={isLevelsOpen}
+        onClose={handleCloseLevels}
+        onApply={handleApplyLevels}
+        onPreview={handlePreviewLevels}
+        originalImageData={levelsOriginalData} 
+      />
     </div>
   );
 }

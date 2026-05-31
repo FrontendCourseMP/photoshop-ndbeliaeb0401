@@ -5,24 +5,19 @@ import HistogramCanvas from './HistogramCanvas';
 import InputLevels from './InputLevels';
 import styles from './LevelsDialog.module.css';
 
-const LevelsDialog = ({ 
-  isOpen, 
-  onClose, 
-  originalImageData, 
-  onApplyLevels, 
-  onPreview    // новый проп
-}) => {
+const LevelsDialog = ({ isOpen, onClose, onApply, onPreview, originalImageData }) => {
   const dialogRef = useRef(null);
   const [histogramMode, setHistogramMode] = useState('linear');
   const [previewEnabled, setPreviewEnabled] = useState(true);
   const { histogram, currentChannel: histChannel, updateChannel: updateHistChannel } = useHistogram(originalImageData);
-  const { 
-    currentChannel, 
-    setCurrentChannel, 
-    settings, 
-    updateSettings, 
-    resetSettings, 
-    adjustedImageData 
+  const {
+    currentChannel,
+    setCurrentChannel,
+    settings,
+    updateSettings,
+    resetSettings,
+    adjustedImageData,
+    preview
   } = useLevels(originalImageData);
 
   useEffect(() => {
@@ -40,24 +35,24 @@ const LevelsDialog = ({
 
   const handleSettingsChange = (newValues) => {
     updateSettings(newValues);
-    // Если предпросмотр включён – вызываем onPreview
     if (previewEnabled && onPreview) {
-      const current = { ...settings, ...newValues };
-      onPreview(currentChannel, current.black, current.gamma, current.white);
+      const updated = { ...settings, ...newValues };
+      const previewData = preview(currentChannel, updated.black, updated.gamma, updated.white);
+      if (previewData) onPreview(previewData);
     }
   };
 
   const handleReset = () => {
     resetSettings();
     if (previewEnabled && onPreview) {
-      const defaultSettings = { black: 0, gamma: 1, white: 255 };
-      onPreview(currentChannel, defaultSettings.black, defaultSettings.gamma, defaultSettings.white);
+      const previewData = preview(currentChannel, 0, 1, 255);
+      if (previewData) onPreview(previewData);
     }
   };
 
   const handleApply = () => {
-    if (adjustedImageData && onApplyLevels) {
-      onApplyLevels(adjustedImageData);
+    if (adjustedImageData && onApply) {
+      onApply(adjustedImageData);
     }
     onClose();
   };
