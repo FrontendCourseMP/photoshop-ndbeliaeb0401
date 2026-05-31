@@ -4,12 +4,13 @@ import Canvas from './components/Canvas/Canvas';
 import StatusBar from './components/StatusBar/StatusBar';
 import ChannelsPanel from './components/ChannelsPanel/ChannelsPanel';
 import InfoPanel from './components/InfoPanel/InfoPanel';
-import LevelsDialog from './components/LevelsDialog/LevelsDialog';  // импорт
+import LevelsDialog from './components/LevelsDialog/LevelsDialog';
 import { useImageLoader } from './hooks/useImageLoader';
 import { useImageExport } from './hooks/useImageExport';
 import { useCanvasResize } from './hooks/useCanvasResize';
 import { useChannels } from './hooks/useChannels';
 import { useEyedropper } from './hooks/useEyedropper';
+import { useLevels } from './hooks/useLevels';
 import styles from './App.module.css';
 
 function App() {
@@ -19,13 +20,14 @@ function App() {
   const [imageInfo, setImageInfo] = useState({ width: null, height: null, colorDepth: null });
   const [isEyedropperActive, setIsEyedropperActive] = useState(false);
   const [pickedColor, setPickedColor] = useState(null);
-  const [isLevelsOpen, setIsLevelsOpen] = useState(false);      // состояние диалога
+  const [isLevelsOpen, setIsLevelsOpen] = useState(false);
 
   const { loadImageFromUrl } = useImageLoader(setOriginalImageData, setImageInfo);
   const { exportPNG, exportJPG, exportGB7 } = useImageExport(canvasRef);
   useCanvasResize(canvasRef, displayImageData);
   const { activeChannels, toggleChannel, hasAlpha } = useChannels(originalImageData, setDisplayImageData);
   const { pickedColor: eyedropperColor } = useEyedropper(canvasRef, isEyedropperActive, setPickedColor);
+  const { levelsState, updateLevels, resetLevels, applyLevels, previewLevels } = useLevels(originalImageData, setDisplayImageData);
 
   const handleActivateEyedropper = () => {
     setIsEyedropperActive(!isEyedropperActive);
@@ -34,6 +36,19 @@ function App() {
 
   const handleOpenLevels = () => setIsLevelsOpen(true);
   const handleCloseLevels = () => setIsLevelsOpen(false);
+
+  const handleLevelsApply = () => {
+    applyLevels();
+    handleCloseLevels();
+  };
+
+  const handleLevelsReset = () => {
+    resetLevels();
+  };
+
+  const handleLevelsPreview = (channelId, black, gamma, white) => {
+    previewLevels(channelId, black, gamma, white);
+  };
 
   return (
     <div className={styles.app}>
@@ -61,12 +76,18 @@ function App() {
         hasAlpha={hasAlpha}
       />
       <InfoPanel colorInfo={pickedColor} isActive={isEyedropperActive} />
-      
+
       <LevelsDialog
-        isOpen={isLevelsOpen}
-        onClose={handleCloseLevels}
-        originalImageData={originalImageData}
-      />
+  isOpen={isLevelsOpen}
+  onClose={handleCloseLevels}
+  onApplyLevels={(imageData) => {
+    setDisplayImageData(imageData);
+    setOriginalImageData(imageData); // если нужно сохранить изменения
+  }}
+  onPreview={handleLevelsPreview}
+  originalImageData={originalImageData}
+  levelsState={levelsState}
+/>
     </div>
   );
 }
