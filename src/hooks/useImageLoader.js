@@ -16,7 +16,7 @@ export const useImageLoader = (setOriginalImageData, setImageInfo) => {
         const { width, height, hasMask, grayValues } = decodeGB7(arrayBuffer);
         const imageData = new ImageData(width, height);
         for (let i = 0; i < width * height; i++) {
-          const gray = Math.round(grayValues[i] * 2);
+          const gray = Math.round(grayValues[i] / 127 * 255);
           imageData.data[i * 4] = gray;
           imageData.data[i * 4 + 1] = gray;
           imageData.data[i * 4 + 2] = gray;
@@ -39,7 +39,17 @@ export const useImageLoader = (setOriginalImageData, setImageInfo) => {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
       const imageData = ctx.getImageData(0, 0, img.width, img.height);
-      processImageData(imageData, img.width, img.height, 24);
+      let colorDepth = 24;
+      const data = imageData.data;
+      let hasAlpha = false;
+      for (let i = 3; i < data.length; i += 4) {
+        if (data[i] !== 255) {
+          hasAlpha = true;
+          break;
+        }
+      }
+      if (hasAlpha) colorDepth = 32;
+      processImageData(imageData, img.width, img.height, colorDepth);
       URL.revokeObjectURL(url);
     };
     img.src = url;

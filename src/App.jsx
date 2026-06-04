@@ -134,11 +134,12 @@ function App() {
         />
       </div>
       <ChannelsPanel
-        originalImageData={originalImageData}
-        activeChannels={activeChannels}
-        toggleChannel={toggleChannel}
-        hasAlpha={hasAlpha}
-      />
+  originalImageData={originalImageData}
+  activeChannels={activeChannels}
+  toggleChannel={toggleChannel}
+  hasAlpha={hasAlpha}
+  isGrayscale={originalImageData && (imageInfo.colorDepth === 7 || imageInfo.colorDepth === 8)}
+/>
       <InfoPanel
         colorInfo={pickedColor}
         isActive={isEyedropperActive}
