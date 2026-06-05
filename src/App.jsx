@@ -30,7 +30,7 @@ function App() {
   const { loadImageFromUrl } = useImageLoader(setOriginalImageData, setImageInfo);
   const { exportPNG, exportJPG, exportGB7 } = useImageExport(canvasRef);
   useCanvasResize(canvasRef, displayImageData);
-  const { activeChannels, toggleChannel, hasAlpha } = useChannels(originalImageData, setDisplayImageData);
+  const { currentMode, setMode, availableModes } = useChannels(originalImageData, setDisplayImageData);
   useEyedropper(canvasRef, isEyedropperActive, setPickedColor);
 
   const updateDisplayWithScale = useCallback((baseImage, percent, method) => {
@@ -133,12 +133,11 @@ function App() {
           colorDepth={imageInfo.colorDepth}
         />
       </div>
-      <ChannelsPanel
+    <ChannelsPanel
   originalImageData={originalImageData}
-  activeChannels={activeChannels}
-  toggleChannel={toggleChannel}
-  hasAlpha={hasAlpha}
-  isGrayscale={originalImageData && (imageInfo.colorDepth === 7 || imageInfo.colorDepth === 8)}
+  currentMode={currentMode}
+  setMode={setMode}
+  availableModes={availableModes}
 />
       <InfoPanel
         colorInfo={pickedColor}

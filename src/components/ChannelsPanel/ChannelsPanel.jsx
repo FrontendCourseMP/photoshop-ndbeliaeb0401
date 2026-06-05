@@ -1,121 +1,60 @@
 import { useEffect, useRef } from 'react';
+import { applyColorMode } from '../../utils/colorModes';
 import styles from './ChannelsPanel.module.css';
 
-const ChannelsPanel = ({ originalImageData, activeChannels, toggleChannel, hasAlpha, isGrayscale }) => {
-  const canvasRefs = {
-    red: useRef(null),
-    green: useRef(null),
-    blue: useRef(null),
-    alpha: useRef(null),
+const ChannelsPanel = ({ originalImageData, currentMode, setMode, availableModes }) => {
+  const thumbRefs = {
+    rgb: useRef(null),
+    rgba: useRef(null),
+    grayscale: useRef(null),
+    grayscaleAlpha: useRef(null),
   };
 
   useEffect(() => {
     if (!originalImageData) return;
-    const { width, height, data } = originalImageData;
-    const thumbWidth = 70;
-    const thumbHeight = (height / width) * thumbWidth;
 
-    const drawChannelThumb = (ref, getValue) => {
-      const canvas = ref.current;
+    const modes = ['rgb', 'rgba', 'grayscale', 'grayscaleAlpha'];
+    const thumbWidth = 70;
+    const thumbHeight = (originalImageData.height / originalImageData.width) * thumbWidth;
+
+    modes.forEach((mode) => {
+      const canvas = thumbRefs[mode].current;
       if (!canvas) return;
+      const modeImageData = applyColorMode(originalImageData, mode);
       canvas.width = thumbWidth;
       canvas.height = thumbHeight;
       const ctx = canvas.getContext('2d');
-      const imgData = ctx.createImageData(thumbWidth, thumbHeight);
-      const stepX = width / thumbWidth;
-      const stepY = height / thumbHeight;
-      for (let y = 0; y < thumbHeight; y++) {
-        for (let x = 0; x < thumbWidth; x++) {
-          const srcX = Math.floor(x * stepX);
-          const srcY = Math.floor(y * stepY);
-          const idx = (srcY * width + srcX) * 4;
-          const value = getValue(data[idx], data[idx+1], data[idx+2], data[idx+3]);
-          const gray = Math.min(255, Math.max(0, value));
-          const pixelIdx = (y * thumbWidth + x) * 4;
-          imgData.data[pixelIdx] = gray;
-          imgData.data[pixelIdx+1] = gray;
-          imgData.data[pixelIdx+2] = gray;
-          imgData.data[pixelIdx+3] = 255;
-        }
-      }
-      ctx.putImageData(imgData, 0, 0);
-    };
+      const tempCanvas = new OffscreenCanvas(modeImageData.width, modeImageData.height);
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.putImageData(modeImageData, 0, 0);
+      ctx.drawImage(tempCanvas, 0, 0, modeImageData.width, modeImageData.height, 0, 0, thumbWidth, thumbHeight);
+    });
+  }, [originalImageData]);
 
-    if (!isGrayscale) {
-      drawChannelThumb(canvasRefs.red, (r) => r);
-      drawChannelThumb(canvasRefs.green, (_, g) => g);
-      drawChannelThumb(canvasRefs.blue, (_, __, b) => b);
-      drawChannelThumb(canvasRefs.alpha, (_, __, ___, a) => a);
-    } else {
-      // Для grayscale показываем один канал (яркость)
-      const drawGrayThumb = (ref) => {
-        const canvas = ref.current;
-        if (!canvas) return;
-        canvas.width = thumbWidth;
-        canvas.height = thumbHeight;
-        const ctx = canvas.getContext('2d');
-        const imgData = ctx.createImageData(thumbWidth, thumbHeight);
-        const stepX = width / thumbWidth;
-        const stepY = height / thumbHeight;
-        for (let y = 0; y < thumbHeight; y++) {
-          for (let x = 0; x < thumbWidth; x++) {
-            const srcX = Math.floor(x * stepX);
-            const srcY = Math.floor(y * stepY);
-            const idx = (srcY * width + srcX) * 4;
-            const gray = data[idx];
-            const pixelIdx = (y * thumbWidth + x) * 4;
-            imgData.data[pixelIdx] = gray;
-            imgData.data[pixelIdx+1] = gray;
-            imgData.data[pixelIdx+2] = gray;
-            imgData.data[pixelIdx+3] = 255;
-          }
-        }
-        ctx.putImageData(imgData, 0, 0);
-      };
-      drawGrayThumb(canvasRefs.red); // используем ref красного для канала Gray
+  const getLabel = (mode) => {
+    switch (mode) {
+      case 'rgb': return 'RGB';
+      case 'rgba': return 'RGBA';
+      case 'grayscale': return 'Grayscale';
+      case 'grayscaleAlpha': return 'Grayscale + Alpha';
+      default: return mode;
     }
-  }, [originalImageData, isGrayscale]);
+  };
 
   if (!originalImageData) return null;
 
-  if (isGrayscale) {
-    return (
-      <div className={styles.panel}>
-        <h3>Channels</h3>
-        <div className={styles.channelList}>
-          <div
-            className={`${styles.channelCard} ${activeChannels.red ? styles.active : ''}`}
-            onClick={() => toggleChannel('red')}
-            style={{ cursor: 'default', opacity: 0.7 }}
-          >
-            <canvas ref={canvasRefs.red} className={styles.thumbnail} />
-            <span className={styles.channelLabel}>Gray</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const channels = [
-    { id: 'red', label: 'R' },
-    { id: 'green', label: 'G' },
-    { id: 'blue', label: 'B' },
-    { id: 'alpha', label: 'A', disabled: !hasAlpha }
-  ];
-
   return (
     <div className={styles.panel}>
-      <h3>Channels</h3>
-      <div className={styles.channelList}>
-        {channels.map((ch) => (
+      <h3>Color modes</h3>
+      <div className={styles.modes}>
+        {availableModes.map((mode) => (
           <div
-            key={ch.id}
-            className={`${styles.channelCard} ${activeChannels[ch.id] ? styles.active : ''} ${ch.disabled ? styles.disabled : ''}`}
-            onClick={() => !ch.disabled && toggleChannel(ch.id)}
+            key={mode}
+            className={`${styles.modeCard} ${currentMode === mode ? styles.active : ''}`}
+            onClick={() => setMode(mode)}
           >
-            <canvas ref={canvasRefs[ch.id]} className={styles.thumbnail} />
-            <span className={styles.channelLabel}>{ch.label}</span>
-            {ch.disabled && <span className={styles.badge}>no alpha</span>}
+            <canvas ref={thumbRefs[mode]} className={styles.thumbnail} />
+            <span>{getLabel(mode)}</span>
           </div>
         ))}
       </div>
