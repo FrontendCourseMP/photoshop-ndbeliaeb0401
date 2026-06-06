@@ -4,21 +4,157 @@
   border: none;
   border-radius: 20px;
   padding: 0;
-  width: 450px;
+  width: 460px;
   max-width: 90vw;
-  max-height: 85vh;
+  max-height: 80vh;
   color: #eee;
   box-shadow: 0 20px 35px rgba(0,0,0,0.5);
   position: fixed;
-  top: 20px;
-  right: 20px;
-  left: auto;
-  bottom: auto;
   margin: 0;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+  resize: both;
+  min-width: 260px;
+  z-index: 1000;
 }
 
 .dialog::backdrop {
   background: transparent;
   backdrop-filter: none;
+}
+
+.container {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.channelSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.channelBtn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(20,20,30,0.6);
+  color: #ddd;
+  cursor: pointer;
+  transition: 0.1s;
+  font-size: 12px;
+}
+
+.channelBtn.active {
+  background: #5ad;
+  border-color: #aef;
+  color: white;
+}
+
+.histogramControls {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0;
+}
+
+.modeToggle {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ccc;
+}
+
+.previewCheck {
+  margin: 16px 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.previewCheck label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.actions button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(20,20,30,0.8);
+  color: #eee;
+  cursor: pointer;
+  transition: 0.1s;
+}
+
+.actions button:hover {
+  background: #4a4a5a;
+}
+
+.draggableHeader {
+  cursor: move;
+  padding: 12px 20px;
+  background: rgba(20,20,30,0.8);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.draggableHeader h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: white;
+}
+
+@media (max-width: 640px) {
+  .dialog {
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 90vh;
+    top: 2.5vh !important;
+    left: 2.5vw !important;
+    transform: none !important;
+  }
+  .channelSelector {
+    gap: 4px;
+  }
+  .channelBtn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  .actions button {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+  .container {
+    padding: 12px;
+  }
 }
