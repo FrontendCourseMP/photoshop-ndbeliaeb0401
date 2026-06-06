@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useConvolution } from '../../hooks/useConvolution';
+import { presets } from '../../hooks/presets';
 import styles from './KernelDialog.module.css';
 
-const KernelDialog = ({ isOpen, onClose, onApply, originalImageData }) => {
+const KernelDialog = ({ isOpen, onClose, onApply, onPreview, originalImageData }) => {
   const dialogRef = useRef(null);
   const [previewEnabled, setPreviewEnabled] = useState(true);
   const [localKernel, setLocalKernel] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
+  const [isPreviewApplying, setIsPreviewApplying] = useState(false);
 
   const {
     kernel: hookKernel,
@@ -18,6 +19,7 @@ const KernelDialog = ({ isOpen, onClose, onApply, originalImageData }) => {
     setChannel,
     setEdgeStrategy,
     convolve,
+    schedulePreview,
     isApplying,
     setIsApplying
   } = useConvolution();
@@ -33,22 +35,20 @@ const KernelDialog = ({ isOpen, onClose, onApply, originalImageData }) => {
 
   useEffect(() => {
     if (!previewEnabled || !originalImageData || !localKernel) return;
-    const runPreview = async () => {
-      setIsApplying(true);
-      const result = await convolve(originalImageData, localKernel, channel, edgeStrategy);
-      setPreviewImage(result);
-      setIsApplying(false);
-    };
-    runPreview();
-  }, [previewEnabled, originalImageData, localKernel, channel, edgeStrategy, convolve, setIsApplying]);
+    setIsPreviewApplying(true);
+    schedulePreview(originalImageData, localKernel, channel, edgeStrategy, (result) => {
+      if (result && onPreview) onPreview(result);
+      setIsPreviewApplying(false);
+    });
+  }, [previewEnabled, originalImageData, localKernel, channel, edgeStrategy, schedulePreview, onPreview]);
 
   const handlePresetChange = (presetName) => {
     updateKernelFromPreset(presetName);
-    setLocalKernel(hookKernel);
+    setLocalKernel(presets[presetName]);
   };
 
   const handleKernelInputChange = (row, col, value) => {
-    const newKernel = localKernel.map((r, i) => 
+    const newKernel = localKernel.map((r, i) =>
       r.map((v, j) => (i === row && j === col) ? parseFloat(value) || 0 : v)
     );
     setLocalKernel(newKernel);
@@ -66,10 +66,10 @@ const KernelDialog = ({ isOpen, onClose, onApply, originalImageData }) => {
 
   const handleReset = () => {
     updateKernelFromPreset('identity');
-    setLocalKernel(hookKernel);
+    setLocalKernel(presets.identity);
   };
 
-  const presets = [
+  const presetsList = [
     { id: 'identity', label: 'Тождественное' },
     { id: 'sharpen', label: 'Повышение резкости' },
     { id: 'gaussianBlur', label: 'Фильтр Гаусса' },
@@ -100,7 +100,7 @@ const KernelDialog = ({ isOpen, onClose, onApply, originalImageData }) => {
         <div className={styles.presetGroup}>
           <label>Предустановки:</label>
           <select value={preset} onChange={(e) => handlePresetChange(e.target.value)}>
-            {presets.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+            {presetsList.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
           </select>
         </div>
 
@@ -146,7 +146,7 @@ const KernelDialog = ({ isOpen, onClose, onApply, originalImageData }) => {
             />
             Live Preview
           </label>
-          {isApplying && <span className={styles.spinner}>Применение...</span>}
+          {(isApplying || isPreviewApplying) && <span className={styles.spinner}>Применение...</span>}
         </div>
 
         <div className={styles.actions}>
@@ -159,4 +159,4 @@ const KernelDialog = ({ isOpen, onClose, onApply, originalImageData }) => {
   );
 };
 
-export default KernelDialog;    
+export default KernelDialog;

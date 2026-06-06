@@ -4,9 +4,21 @@
   border: none;
   border-radius: 20px;
   padding: 0;
-  width: 480px;
+  width: 460px;
   max-width: 90vw;
   color: #eee;
+  box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: auto;
+  bottom: auto;
+  margin: 0;
+}
+
+.dialog::backdrop {
+  background: transparent;
+  backdrop-filter: none;
 }
 .container {
   padding: 20px;

@@ -31,6 +31,9 @@ function App() {
 
   const handleOpenKernel = () => setIsKernelOpen(true);
   const handleCloseKernel = () => setIsKernelOpen(false);
+  const handlePreviewKernel = (newImageData) => {
+  setDisplayImageData(newImageData);
+};
 
   const { loadImageFromUrl } = useImageLoader(setOriginalImageData, setImageInfo);
   const { exportPNG, exportJPG, exportGB7 } = useImageExport(canvasRef);
@@ -171,6 +174,7 @@ function App() {
      <KernelDialog
   isOpen={isKernelOpen}
   onClose={handleCloseKernel}
+  onPreview={handlePreviewKernel}
   onApply={(newImageData) => {
     setOriginalImageData(newImageData);
     setDisplayImageData(newImageData);
