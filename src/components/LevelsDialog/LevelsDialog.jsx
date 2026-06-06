@@ -1,16 +1,14 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useHistogram } from '../../hooks/useHistogram';
 import { useLevels } from '../../hooks/useLevels';
-import { useDraggable } from '../../hooks/useDraggable';
 import HistogramCanvas from './HistogramCanvas';
 import InputLevels from './InputLevels';
 import styles from './LevelsDialog.module.css';
 
 const LevelsDialog = ({ isOpen, onClose, onApply, onPreview, originalImageData }) => {
-  const { dialogRef, style, handleMouseDown } = useDraggable({ x: 20, y: 80 });
+  const dialogRef = useRef(null);
   const [histogramMode, setHistogramMode] = useState('linear');
   const [previewEnabled, setPreviewEnabled] = useState(true);
-  const [isApplying, setIsApplying] = useState(false);
   const { histogram, currentChannel: histChannel, updateChannel: updateHistChannel } = useHistogram(originalImageData);
   const {
     currentChannel,
@@ -22,71 +20,45 @@ const LevelsDialog = ({ isOpen, onClose, onApply, onPreview, originalImageData }
     preview
   } = useLevels(originalImageData);
 
-  const debounceTimer = useRef(null);
-  const lastSettings = useRef({ black: 0, gamma: 1, white: 255 });
-  const isDialogOpenRef = useRef(false);
-
   useEffect(() => {
-    if (isOpen && !isDialogOpenRef.current) {
+    if (isOpen) {
       dialogRef.current?.showModal();
-      isDialogOpenRef.current = true;
-      if (dialogRef.current && style) {
-        dialogRef.current.style.left = style.left;
-        dialogRef.current.style.top = style.top;
-      }
-    } else if (!isOpen && isDialogOpenRef.current) {
+    } else {
       dialogRef.current?.close();
-      isDialogOpenRef.current = false;
     }
-  }, [isOpen, dialogRef, style]);
+  }, [isOpen]);
 
   const handleChannelChange = (channelId) => {
     setCurrentChannel(channelId);
     updateHistChannel(channelId);
   };
 
-  const handleSettingsChange = useCallback((newValues) => {
-    const updated = { ...settings, ...newValues };
+  const handleSettingsChange = (newValues) => {
     updateSettings(newValues);
-    
-    if (updated.black === lastSettings.current.black &&
-        updated.gamma === lastSettings.current.gamma &&
-        updated.white === lastSettings.current.white) {
-      return;
-    }
-    lastSettings.current = { black: updated.black, gamma: updated.gamma, white: updated.white };
-    
     if (previewEnabled && onPreview) {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-      debounceTimer.current = setTimeout(() => {
-        const previewData = preview(currentChannel, updated.black, updated.gamma, updated.white);
-        if (previewData) onPreview(previewData);
-      }, 50);
+      const updated = { ...settings, ...newValues };
+      const previewData = preview(currentChannel, updated.black, updated.gamma, updated.white);
+      if (previewData) onPreview(previewData);
     }
-  }, [updateSettings, settings, previewEnabled, onPreview, preview, currentChannel]);
+  };
 
   const handleReset = () => {
     resetSettings();
-    lastSettings.current = { black: 0, gamma: 1, white: 255 };
     if (previewEnabled && onPreview) {
       const previewData = preview(currentChannel, 0, 1, 255);
       if (previewData) onPreview(previewData);
     }
   };
 
-  const handleApply = async () => {
-    if (isApplying) return;
-    setIsApplying(true);
+  const handleApply = () => {
     if (adjustedImageData && onApply) {
-      await onApply(adjustedImageData);
+      onApply(adjustedImageData);
     }
-    setIsApplying(false);
     onClose();
   };
 
   const handleCancel = () => {
     resetSettings();
-    lastSettings.current = { black: 0, gamma: 1, white: 255 };
     onClose();
   };
 
@@ -99,12 +71,10 @@ const LevelsDialog = ({ isOpen, onClose, onApply, onPreview, originalImageData }
   ];
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog} onClose={handleCancel} style={style}>
-      <div className={styles.draggableHeader} onMouseDown={handleMouseDown}>
-        <h2>Levels Adjustment</h2>
-        <button className={styles.closeBtn} onClick={handleCancel}>✕</button>
-      </div>
+    <dialog ref={dialogRef} className={styles.dialog} onClose={handleCancel}>
       <div className={styles.container}>
+        <h2>Levels Adjustment</h2>
+
         <div className={styles.channelSelector}>
           {channels.map(ch => (
             <button
@@ -153,7 +123,7 @@ const LevelsDialog = ({ isOpen, onClose, onApply, onPreview, originalImageData }
         <div className={styles.actions}>
           <button onClick={handleReset}>Reset</button>
           <button onClick={handleCancel}>Cancel</button>
-          <button onClick={handleApply} disabled={isApplying}>Apply</button>
+          <button onClick={handleApply}>Apply</button>
         </div>
       </div>
     </dialog>
