@@ -4,17 +4,17 @@ const InputLevels = ({ black, gamma, white, onChange, min = 0, max = 255 }) => {
   const handleBlackChange = (e) => {
     let val = Number(e.target.value);
     if (val >= white) val = white - 1;
-    onChange({ black: val });
+    requestAnimationFrame(() => onChange({ black: val }));
   };
   const handleGammaChange = (e) => {
     let val = parseFloat(e.target.value);
     if (isNaN(val)) val = 1;
-    onChange({ gamma: val });
+    requestAnimationFrame(() => onChange({ gamma: val }));
   };
   const handleWhiteChange = (e) => {
     let val = Number(e.target.value);
     if (val <= black) val = black + 1;
-    onChange({ white: val });
+    requestAnimationFrame(() => onChange({ white: val }));
   };
 
   return (
