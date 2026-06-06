@@ -4,7 +4,7 @@ import { useDropzone } from 'react-dropzone';
 import { FiUpload, FiInfo, FiSave, FiImage, FiChevronDown, FiDroplet, FiSliders,FiMaximize2 } from 'react-icons/fi';
 import styles from './Toolbar.module.css';
 
-const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7, onActivateEyedropper, isEyedropperActive, onOpenLevels,onOpenResize}) => {
+const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7, onActivateEyedropper, isEyedropperActive, onOpenLevels,onOpenResize,onOpenKernel }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState({});
   const btnRef = useRef(null);

@@ -128,6 +128,7 @@ function App() {
         onActivateEyedropper={handleActivateEyedropper}
         isEyedropperActive={isEyedropperActive}
         onOpenLevels={handleOpenLevels}
+        onOpenKernel={handleOpenKernel}
         onOpenResize={handleOpenResize} 
       />
       <div className={styles.mainArea}>
