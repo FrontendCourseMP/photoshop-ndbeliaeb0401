@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useDropzone } from 'react-dropzone';
-import { FiUpload, FiInfo, FiSave, FiImage, FiChevronDown, FiDroplet, FiSliders,FiMaximize2 } from 'react-icons/fi';
+import { FiUpload,FiFilter, FiInfo, FiSave, FiImage, FiChevronDown, FiDroplet, FiSliders,FiMaximize2 } from 'react-icons/fi';
 import styles from './Toolbar.module.css';
 
 const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7, onActivateEyedropper, isEyedropperActive, onOpenLevels,onOpenResize,onOpenKernel }) => {

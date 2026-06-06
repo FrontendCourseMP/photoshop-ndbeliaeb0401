@@ -168,9 +168,14 @@ function App() {
         originalHeight={originalImageData?.height || 0}
         currentMethod={interpolationMethod}
       />
-      <KernelDialog
+     <KernelDialog
   isOpen={isKernelOpen}
   onClose={handleCloseKernel}
+  onApply={(newImageData) => {
+    setOriginalImageData(newImageData);
+    setDisplayImageData(newImageData);
+    setScalePercent(100);
+  }}
   originalImageData={originalImageData}
 />
     </div>

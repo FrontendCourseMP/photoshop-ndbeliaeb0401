@@ -387,3 +387,36 @@
     width: auto;
   }
 }
+
+.kernelBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(20, 20, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  color: #ddd;
+  font-size: 13px;
+  width: 100%;
+  text-align: center;
+}
+
+.kernelBtn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #4a4a5a, #3a3a4a);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 640px) {
+  .kernelBtn {
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px 12px;
+    width: auto;
+  }
+}

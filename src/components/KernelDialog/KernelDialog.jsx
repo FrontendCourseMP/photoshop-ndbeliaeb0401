@@ -1,28 +1,111 @@
 import { useEffect, useRef, useState } from 'react';
+import { useConvolution } from '../../hooks/useConvolution';
 import styles from './KernelDialog.module.css';
 
-const KernelDialog = ({ isOpen, onClose, originalImageData }) => {
+const KernelDialog = ({ isOpen, onClose, onApply, originalImageData }) => {
   const dialogRef = useRef(null);
-  const [kernel, setKernel] = useState([
-    [0, 0, 0],
-    [0, 1, 0],
-    [0, 0, 0]
-  ]);
+  const [previewEnabled, setPreviewEnabled] = useState(true);
+  const [localKernel, setLocalKernel] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+
+  const {
+    kernel: hookKernel,
+    preset,
+    channel,
+    edgeStrategy,
+    updateKernelFromPreset,
+    updateKernelManually,
+    setChannel,
+    setEdgeStrategy,
+    convolve,
+    isApplying,
+    setIsApplying
+  } = useConvolution();
 
   useEffect(() => {
     if (isOpen) {
       dialogRef.current?.showModal();
+      setLocalKernel(hookKernel);
     } else {
       dialogRef.current?.close();
     }
-  }, [isOpen]);
+  }, [isOpen, hookKernel]);
+
+  useEffect(() => {
+    if (!previewEnabled || !originalImageData || !localKernel) return;
+    const runPreview = async () => {
+      setIsApplying(true);
+      const result = await convolve(originalImageData, localKernel, channel, edgeStrategy);
+      setPreviewImage(result);
+      setIsApplying(false);
+    };
+    runPreview();
+  }, [previewEnabled, originalImageData, localKernel, channel, edgeStrategy, convolve, setIsApplying]);
+
+  const handlePresetChange = (presetName) => {
+    updateKernelFromPreset(presetName);
+    setLocalKernel(hookKernel);
+  };
+
+  const handleKernelInputChange = (row, col, value) => {
+    const newKernel = localKernel.map((r, i) => 
+      r.map((v, j) => (i === row && j === col) ? parseFloat(value) || 0 : v)
+    );
+    setLocalKernel(newKernel);
+    updateKernelManually(newKernel);
+  };
+
+  const handleApply = async () => {
+    if (!originalImageData) return;
+    setIsApplying(true);
+    const result = await convolve(originalImageData, localKernel, channel, edgeStrategy);
+    setIsApplying(false);
+    if (onApply) onApply(result);
+    onClose();
+  };
+
+  const handleReset = () => {
+    updateKernelFromPreset('identity');
+    setLocalKernel(hookKernel);
+  };
+
+  const presets = [
+    { id: 'identity', label: 'Тождественное' },
+    { id: 'sharpen', label: 'Повышение резкости' },
+    { id: 'gaussianBlur', label: 'Фильтр Гаусса' },
+    { id: 'boxBlur', label: 'Прямоугольное размытие' },
+    { id: 'prewittX', label: 'Прюитт X' },
+    { id: 'prewittY', label: 'Прюитт Y' }
+  ];
+
+  const channels = [
+    { id: 'all', label: 'Все каналы' },
+    { id: 'red', label: 'Красный' },
+    { id: 'green', label: 'Зелёный' },
+    { id: 'blue', label: 'Синий' },
+    { id: 'alpha', label: 'Альфа' }
+  ];
+
+  const edgeStrategies = [
+    { id: 'copy', label: 'Копирование' },
+    { id: 'black', label: 'Чёрный' },
+    { id: 'white', label: 'Белый' }
+  ];
 
   return (
     <dialog ref={dialogRef} className={styles.dialog} onClose={onClose}>
       <div className={styles.container}>
         <h2>Пользовательский фильтр (ядро 3x3)</h2>
+
+        <div className={styles.presetGroup}>
+          <label>Предустановки:</label>
+          <select value={preset} onChange={(e) => handlePresetChange(e.target.value)}>
+            {presets.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+          </select>
+        </div>
+
         <div className={styles.kernelGrid}>
-          {kernel.map((row, i) => (
+          {localKernel && localKernel.map((row, i) => (
             <div key={i} className={styles.kernelRow}>
               {row.map((val, j) => (
                 <input
@@ -30,19 +113,50 @@ const KernelDialog = ({ isOpen, onClose, originalImageData }) => {
                   type="number"
                   step="0.1"
                   value={val}
+                  onChange={(e) => handleKernelInputChange(i, j, e.target.value)}
                   className={styles.kernelInput}
                 />
               ))}
             </div>
           ))}
         </div>
+
+        <div className={styles.optionsGroup}>
+          <div className={styles.selectGroup}>
+            <label>Применить к:</label>
+            <select value={channel} onChange={(e) => setChannel(e.target.value)}>
+              {channels.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+
+          <div className={styles.selectGroup}>
+            <label>Обработка краёв:</label>
+            <select value={edgeStrategy} onChange={(e) => setEdgeStrategy(e.target.value)}>
+              {edgeStrategies.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className={styles.previewCheck}>
+          <label>
+            <input
+              type="checkbox"
+              checked={previewEnabled}
+              onChange={(e) => setPreviewEnabled(e.target.checked)}
+            />
+            Live Preview
+          </label>
+          {isApplying && <span className={styles.spinner}>Применение...</span>}
+        </div>
+
         <div className={styles.actions}>
+          <button onClick={handleReset}>Сброс</button>
           <button onClick={onClose}>Отмена</button>
-          <button onClick={onClose}>Применить</button>
+          <button onClick={handleApply} disabled={isApplying}>Применить</button>
         </div>
       </div>
     </dialog>
   );
 };
 
-export default KernelDialog;
+export default KernelDialog;    

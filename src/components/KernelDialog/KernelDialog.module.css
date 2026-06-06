@@ -4,17 +4,29 @@
   border: none;
   border-radius: 20px;
   padding: 0;
-  width: 400px;
+  width: 480px;
+  max-width: 90vw;
   color: #eee;
 }
 .container {
   padding: 20px;
 }
+.presetGroup {
+  margin-bottom: 16px;
+}
+.presetGroup select {
+  width: 100%;
+  padding: 8px;
+  background: rgba(20,20,30,0.8);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: #eee;
+}
 .kernelGrid {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin: 20px 0;
+  margin: 16px 0;
 }
 .kernelRow {
   display: flex;
@@ -30,10 +42,40 @@
   color: #eee;
   text-align: center;
 }
+.optionsGroup {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.selectGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.selectGroup select {
+  padding: 6px;
+  background: rgba(20,20,30,0.8);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: #eee;
+}
+.previewCheck {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0;
+}
+.spinner {
+  font-size: 12px;
+  color: #aaa;
+}
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  margin-top: 16px;
 }
 .actions button {
   padding: 8px 20px;
@@ -42,4 +84,8 @@
   border-radius: 8px;
   color: #eee;
   cursor: pointer;
+}
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
