@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import Toolbar from './components/Toolbar/Toolbar';
 import Canvas from './components/Canvas/Canvas';
 import StatusBar from './components/StatusBar/StatusBar';
+import KernelDialog from './components/KernelDialog/KernelDialog';
 import ChannelsPanel from './components/ChannelsPanel/ChannelsPanel';
 import InfoPanel from './components/InfoPanel/InfoPanel';
 import LevelsDialog from './components/LevelsDialog/LevelsDialog';
@@ -26,6 +27,10 @@ function App() {
   const [scalePercent, setScalePercent] = useState(100);
   const [isResizeOpen, setIsResizeOpen] = useState(false);
   const [interpolationMethod, setInterpolationMethod] = useState('bilinear');
+  const [isKernelOpen, setIsKernelOpen] = useState(false);
+
+  const handleOpenKernel = () => setIsKernelOpen(true);
+  const handleCloseKernel = () => setIsKernelOpen(false);
 
   const { loadImageFromUrl } = useImageLoader(setOriginalImageData, setImageInfo);
   const { exportPNG, exportJPG, exportGB7 } = useImageExport(canvasRef);
@@ -162,6 +167,11 @@ function App() {
         originalHeight={originalImageData?.height || 0}
         currentMethod={interpolationMethod}
       />
+      <KernelDialog
+  isOpen={isKernelOpen}
+  onClose={handleCloseKernel}
+  originalImageData={originalImageData}
+/>
     </div>
   );
 }

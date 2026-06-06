@@ -108,6 +108,10 @@ const Toolbar = ({ onFileLoad, onExportPNG, onExportJPG, onExportGB7, onActivate
   <FiMaximize2 className={styles.icon} />
   <span>Размер</span>
 </button>
+<button onClick={onOpenKernel} className={styles.kernelBtn}>
+  <FiFilter className={styles.icon} />
+  <span>Фильтры</span>
+</button>
 
       <div className={styles.info}>
         <FiInfo className={styles.iconSmall} />
