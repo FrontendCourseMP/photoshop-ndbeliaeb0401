@@ -95,7 +95,7 @@ function App() {
   };
 
   const handleScaleChange = (percent) => {
-    setScalePercent(percent);
+     requestAnimationFrame(() => setScalePercent(percent));
   };
 
   const handleMethodChange = (method) => {

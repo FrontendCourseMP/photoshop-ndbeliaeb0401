@@ -22,8 +22,8 @@ const nearestNeighbor = (srcData, srcWidth, srcHeight, dstWidth, dstHeight) => {
 
 const bilinear = (srcData, srcWidth, srcHeight, dstWidth, dstHeight) => {
   const dstData = new Uint8ClampedArray(dstWidth * dstHeight * 4);
-  const xRatio = srcWidth / dstWidth;
-  const yRatio = srcHeight / dstHeight;
+  const xRatio = (srcWidth - 1) / (dstWidth - 1);
+  const yRatio = (srcHeight - 1) / (dstHeight - 1);
 
   for (let y = 0; y < dstHeight; y++) {
     const srcY = y * yRatio;
@@ -37,21 +37,20 @@ const bilinear = (srcData, srcWidth, srcHeight, dstWidth, dstHeight) => {
       const x1 = Math.floor(srcX);
       const x2 = Math.min(x1 + 1, srcWidth - 1);
       const dx = srcX - x1;
-
       const idx11 = (y1 * srcWidth + x1) * 4;
       const idx12 = (y1 * srcWidth + x2) * 4;
       const idx21 = (y2 * srcWidth + x1) * 4;
       const idx22 = (y2 * srcWidth + x2) * 4;
-
+      const dstIdx = dstRow + x * 4;
       for (let c = 0; c < 4; c++) {
         const v11 = srcData[idx11 + c];
         const v12 = srcData[idx12 + c];
         const v21 = srcData[idx21 + c];
         const v22 = srcData[idx22 + c];
-        const v1 = v11 * (1 - dx) + v12 * dx;
-        const v2 = v21 * (1 - dx) + v22 * dx;
-        const val = v1 * (1 - dy) + v2 * dy;
-        dstData[dstRow + x * 4 + c] = Math.round(val);
+        const top = v11 * (1 - dx) + v12 * dx;
+        const bottom = v21 * (1 - dx) + v22 * dx;
+        const value = top * (1 - dy) + bottom * dy;
+        dstData[dstIdx + c] = Math.min(255, Math.max(0, Math.round(value)));
       }
     }
   }

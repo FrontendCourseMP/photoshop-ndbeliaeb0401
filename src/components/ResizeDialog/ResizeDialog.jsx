@@ -4,8 +4,8 @@ import styles from './ResizeDialog.module.css';
 const ResizeDialog = ({ isOpen, onClose, onResize, originalWidth, originalHeight, currentMethod }) => {
   const dialogRef = useRef(null);
   const [unit, setUnit] = useState('percent');
-  const [width, setWidth] = useState(originalWidth);
-  const [height, setHeight] = useState(originalHeight);
+  const [width, setWidth] = useState(100);
+  const [height, setHeight] = useState(100);
   const [keepAspect, setKeepAspect] = useState(true);
   const [method, setMethod] = useState(currentMethod);
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
@@ -13,12 +13,17 @@ const ResizeDialog = ({ isOpen, onClose, onResize, originalWidth, originalHeight
   useEffect(() => {
     if (isOpen) {
       dialogRef.current?.showModal();
-      setWidth(originalWidth);
-      setHeight(originalHeight);
+      if (unit === 'percent') {
+        setWidth(100);
+        setHeight(100);
+      } else {
+        setWidth(originalWidth);
+        setHeight(originalHeight);
+      }
     } else {
       dialogRef.current?.close();
     }
-  }, [isOpen, originalWidth, originalHeight]);
+  }, [isOpen, originalWidth, originalHeight, unit]);
 
   const handleUnitChange = (newUnit) => {
     setUnit(newUnit);
